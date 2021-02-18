@@ -46,7 +46,7 @@ if(isset($_GET['country'])) {
             <label for="countries">Les pays disponibles : </label>
             <select class="form-control" name="country" id="countries">
                                     <?php foreach ($countries as $country => $value): ?>
-                                    <option value="<?=$country?>" <?= $countrySelected === $country ? 'selected' : ''; ?>><?= mb_strtoupper($country); ?></option>
+                                    <option value="<?=$country?>"><?= mb_strtoupper($country); ?></option>
                                     <?php endforeach; ?>
                             </select>
         </div>
