@@ -1,26 +1,15 @@
 <?php
 
-$countries = [
-    'germany' =>
-        ['capital-name' => 'berlin',
-        'flag-file' => 'germany-flag-icon-256.png'],
-    'belgique' =>
-          ['capital-name' => 'bruxelles',
-          'flag-file' => 'belgium-flag-icon-256.png'],
-    'corée du nord' =>
-        ['capital-name' => 'pyongyang',
-            'flag-file' => 'north-korea-flag-icon-256.png'],
-    'afrique du sud' =>
-        ['capital-name' => 'pretoria',
-            'flag-file' => 'south-africa-flag-icon-256.png']
-];
+require('validation.php');
+$countries = require('data/countries.php');
+ksort($countries);
 
-if(isset($_GET['country'])) {
-    if(array_key_exists($_GET['country'], $countries)) {
-        $countrySelected = $_GET['country'];
-    } else {
-        $error = 'Ce pays ne fait pas partie de nos listes.';
-    }
+$data = [];
+$countrySelectedName = '';
+
+if (isset($_GET['country'])) {
+    $data = validated();
+    $countrySelectedName = array_keys($data)[0]; // contient uniquement le nom du pays
 }
 
 ?>
@@ -45,30 +34,33 @@ if(isset($_GET['country'])) {
         <div class="form-group">
             <label for="countries">Les pays disponibles : </label>
             <select class="form-control" name="country" id="countries">
-                                    <?php foreach ($countries as $country => $value): ?>
-                                    <option value="<?=$country?>"><?= mb_strtoupper($country); ?></option>
-                                    <?php endforeach; ?>
-                            </select>
+                <?php foreach ($countries as $country => $countryInfo): ?>
+                    <option value="<?= urlencode($country) ?>"
+                        <?= $countrySelectedName === $country ? 'selected' : ''; ?>
+                    ><?= mb_strtoupper($country); ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-primary mb-2">Donne moi sa capitale</button>
         </div
     </form>
-            <?php if(isset($countrySelected)): ?>
-        <img src="<?= $countries[$countrySelected]['flag-file'] ?>" class="mr-3" alt="Drapeau de <?= $countrySelected ?>">
+    <?php if (count($data[$countrySelectedName])): ?>
+        <img src="<?= $countries[$data[$countrySelectedName]]['flag-file'] ?>" class="mr-3"
+             alt="Drapeau de <?= ucwords($countrySelectedName) ?>">
         <div class="media-body">
-            <h2><?= ucwords($countrySelected) ?></h2>
-            <p>Sa capitale est <?= ucwords($countries[$countrySelected]['capital-name']) ?></p>
+            <h2><?= ucwords($countrySelectedName) ?></h2>
+            <p>Sa capitale est <?= ucwords($countrySelectedName) ?></p>
         </div>
-        <?php endif; ?>
-    <?php if(isset($error)): ?>
-    <section class="alert alert-danger" role="alert">
-        <h2 class="text-center mb-4">⚠️ Attention&nbsp;! ⚠️</h2>
-        <p><?= $error ?> 🥺</p>
-        <p>Merci d’en choisir un à l’aide du menu de sélection ci-dessus ☝🏼</p>
-    </section>
     <?php endif; ?>
-        </main>
+    <?php if (isset($data['error'])): ?>
+        <section class="alert alert-danger" role="alert">
+            <h2 class="text-center mb-4">⚠️ Attention&nbsp;! ⚠️</h2>
+            <p><?= $data['error'] ?> 🥺</p>
+            <p>Merci d’en choisir un à l’aide du menu de sélection ci-dessus ☝🏼</p>
+        </section>
+    <?php endif; ?>
+</main>
 </body>
 </html>
 
